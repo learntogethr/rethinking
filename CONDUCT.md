@@ -1,19 +1,4 @@
-# rethinking
-Study Group for Statistical Rethinking by R. McElreath (2015)
-
-## Useful Links for Study Group:
-
-+ Order the book at [CRC Press](https://www.crcpress.com/Statistical-Rethinking-A-Bayesian-Course-with-R-Examples/McElreath/9781482253443) or [Amazon](http://www.amazon.com/Statistical-Rethinking-Bayesian-Examples-Chapman/dp/1482253445)
-+ Book
-  [sample](http://xcelab.net/rmpubs/rethinking/Statistical_Rethinking_sample.pdf)a
-+ McElreath's 2015 [slides](https://speakerdeck.com/rmcelreath)
-+ McElreath's 2015
-  [lectures](https://www.youtube.com/playlist?list=PLDcUM9US4XdMdZOhJWJJD4mDBMnbTWw_z)
-+ McElreath's [code](http://xcelab.net/rmpubs/rethinking/code.txt) examples from book
-+ `rethinking` [package](https://github.com/rmcelreath/rethinking)
-+ [Errata](https://github.com/rmcelreath/rethinking/blob/master/ERRATA.md)
-
-## Contributor Code of Conduct
+# Contributor Code of Conduct
 
 As contributors and maintainers of this project, we pledge to respect all people who 
 contribute through reporting issues, posting feature requests, updating documentation,
@@ -37,6 +22,4 @@ opening an issue or contacting one or more of the project maintainers.
 
 This Code of Conduct is adapted from the Contributor Covenant 
 (http:contributor-covenant.org), version 1.0.0, available at 
-http://contributor-covenant.org/version/1/0/0/ via
-[tidyverse/googledrive](https://github.com/tidyverse/googledrive/blob/master/CONDUCT.md)
-
+http://contributor-covenant.org/version/1/0/0/
