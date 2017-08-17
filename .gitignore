@@ -1,3 +1,7 @@
+# osx ignores
+.DS_Store
+
+# R ignores
 .Rproj.user
 .Rhistory
 .RData
