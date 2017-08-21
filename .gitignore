@@ -6,3 +6,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# file name ignores
+scratch*
