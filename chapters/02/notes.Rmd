@@ -1,0 +1,461 @@
+---
+title: "Chapter 02: Small Worlds & Large Worlds"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    social: menu
+    source_code: embed
+    theme: lumen
+---
+
+<style>
+.desktop-layout {
+  padding: 30px;
+}
+</style>
+
+```{r}
+# options for DT::datatable
+dt_format <- list(
+  searching = FALSE,
+  paging = FALSE,
+  scrollX = TRUE,
+  scrollY = "300px")
+```
+
+Packages {data-navmenu="Explore" data-icon="fa-book"}
+==================================================
+
+Packages
+
+You will load the following packages in order to work with the code provided in this chapter.
+
+```{r echo=TRUE}
+library(tidyverse)
+library(rethinking)
+```
+
+```{r}
+library(DT)
+```
+
+
+Definitions {data-navmenu="Explore" data-icon="fa-puzzle-piece"}
+==================================================
+
+__Conjecture__: The number of possibilities consistent with what we know about the contents of the observable events
+
+plausibility of [$\bullet\circ\circ\circ$] after seeing $\bullet\circ\bullet$ 
+$\propto$
+ways [$\bullet\circ\circ\circ$] can produce $\bullet\circ\bullet$
+$\times$
+prior plausibility [$\bullet\circ\circ\circ$]
+
+$\propto$ = _proportional to_
+
+<br>
+
+We can define _p_ as the proportion of marbles that are blue, e.g,. for [$\bullet\circ\circ\circ$], _p_ = 
+* A conjectured proportion of blue marbles, _p_, is usually called a __PARAMETER__ value.  It's just a way of indexing possible explanations of the data.
+* The relative number of ways that a value _p_ can produce the data is usually called a __LIKELIHOOD__.  It is derived by enumerating all the possible data sequences that could have happened and then eliminating those sequences inconsistent with the data.
+* The prior plausibility of any speific _p_ is usually called the __PRIOR PROBABILITY__.
+* The new, updated plausibility of any specific _p_ is usually called the __POSTERIOR PROBABILITY__.
+
+<br>
+
+__Building a model__
+
+1. __Data story__: Motivate the model by narrating how the data might arise
+2. __Update__: Educate your model by feeding it the data
+3. __Evaluate__:  All statistical models require supervision, leading possibly to model revision
+
+<br>
+
+__Components of the model__
+
+1. The number of ways each conjecture could produce an observation
+2. The accumulated number of ways each conjecture could produce the entire data
+3. The initial plausibility of each conjectured cause of the data
+
+<br>
+
+__Likelihood__
+
+The first and most influential component of a Bayseian model is the __LIKELIHOOD__.  The likelihood is a mathematical formula that specifies the plausability of the data.  What this means is that the likelihood maps each conjecture--such as a proportion of water on the glob(W)--onto the relative number of ways the data could occur, given that possibility.
+
+We can build our own likelihood formula and there are two important assumptions that help guide us:
+
+1. Every toss is independent of the other tosses
+2. The probability of W is the same on every toss
+
+Probability theory provides a unique answer, known as the _binomial distribution_.  This is the common "coin tossing" distribution.  So the probability of observing _w_ W's in _n_ tosses, with a probability _p_ of W, is:
+
+$$ \Pr(w|n,p)=\frac{n!}{w!(n-w)!}p^{w}(1-p)^{n-w} $$
+
+> The count of 'water' observations _w_ is distributed binomially, with probabiity _p_ of 'water' on each toss and _n_ tosses in total
+
+<br>
+
+__Parameters__
+
+For most liklihood functions, there are adjustable inputs.  In the binomial liklihood, these inputs are _p_ (the probability of seeing a W), _n_ (the sample size), and _w_ (the number of W's).  One or all of these may also be quantities that we wish to estimate from data, i.e., __PARAMETERS__, and they represent the different conjectures for causes or explanations of the data.
+
+In the Bayesian framework the difference between data and parameters is fuzzy.  There is a way to exploit this fuzzy continuity between certainty (data) and uncertainty (parameters) to incorporate measurement error and missing data into modeling.
+
+<br>
+
+__Prior__
+
+For every parameter you intend your Bayesian machine to estimate, you must provide the machine a __PRIOR__.  A Bayesian machine must have an inital plausibility assignment for each possible value of the parameter.  The prior is this initial set of plausibilities.
+
+>__Prior as probability distribution__
+>
+>$$ \Pr(p)=\frac{1}{1-0}=1 $$
+>
+>The prior is a probability distribution for the parameter.  In general, for a uniform prior from _a_ to _b_.  The probability of any point in the interval is $1/(b-a)$.  Remember, that every probability distribution must sum (integrate) to 1.  The expression $1/(b-a)$ ensures that the area under the flat line from _a_ to _b_ is equal to 1.
+>
+>Where do priors come from? = __They are engineering assumptions, chosen to help the machine learn__
+>
+>The flat prior is common but hardly ever the best prior.  We'll learn later that priors that gently nudge the machine generally improve inference.  Priors of this kind are sometimes called __REGULARIZING__ or __WEAKLY INFORMATIVE__ priors.  There are mathematically equivalent approaches in non-Bayesian settings: __PENALIZED LIKELIHOOD__. 
+>
+>Priors are conservative in that they tend to gaurd against inferring strong associations between variables.  Broadly, the prior should constrain the parameters to reasonable ranges as well as expressing any knowledge we have about the parameter before any data are observed.
+>
+
+<br>
+
+__Posterior__
+
+Onve you have chosen a likelihood, which parameters are to be estimated and a prior for each parameter, a Bayesian model treats the estimates as a purely logical consequence of those assumptions.  For every unique combination of data, likelihood, parameters, and prior, there is a unique set of estimates.  The resulting estimates--the relative plausability of different parameter values, conditioned on the data--are known as the __POSTERIOR DISTRIBUTION__.  The posterior distribution takes the form of the probability of the parameters, conditional on the data: $\Pr(p|n,w)$.
+
+The mathematical procedure that defines the logic of the posterior distribution is __BAYES' THEOREM__.  Like the garden of forking data, this is still just counting.  For simplicity we can omit _n_ from the notation.  The joint probability of the data _w_ and any particular value of _p_ is:
+
+$$ \Pr(w,p)=\Pr(w|p)\Pr(p) $$
+
+This says that the probability of _w_ and _p_ is the product of the likelihood $\Pr(w|p)$ and the prior probability $\Pr(p)$.  This is like saying that the probability of rain and cold on the same day is equal to the probability of rain, when it's cold, times the probability that it's cold.  This much is just defintion.  But it's just as true that:
+
+$$ \Pr(w,p)=\Pr(p|w)\Pr(w) $$
+
+Reversing which probability is conditional still yields a true definition.  It reads: the probability of rain and cold on the same days is equal to the probability that it's cold, when it's raining, times the probability of rain.
+
+Since both the right-hand sides are equal to the same thing, we can set them equal to one another and solve for the posterior probability, $\Pr(p|w)$:
+
+$$ \Pr(p|w)=\frac{\Pr(w|p)\Pr(p)}{\Pr(w)} $$
+
+This is Bayes' theorem.  It says that the probability of any particular value of _p_, considering the data, is equal to the product of the likelihood and prior, divided by this thing $\Pr(w)$, which we can call the _average likelihood_.  In word form:
+
+$$ Posterior=\frac{Liklihood \times Prior}{Average \ Likelihood} $$
+
+The average likelihood, $\Pr(w)$, can be confusing.  It is commonly called the "evidence" or the "probability of the data"--neither of which is transparent.  The probability of $\Pr(w)$ is merely the _average likelihood_ of the data.  __Averaged over the prior__.  It's job is to standardize the posterior, to ensure it sums (integrates) to one.  In mathematical form:
+
+$$ \Pr(w)=E(\Pr(w|p))=\int\Pr(w|p)\Pr(p)dp $$
+
+The operator E means to take an _expectation__.  Such averages are commonly called _marginals_ in mathematical statistics, and so you may also see this same probability called a _marginal likelihood_.  And the integral above just defines the proper way to compute the average over a continuous distribution of values, like the infite possible values of _p_.
+
+> __Take home__: the posterior is proportional to the product of the prior and the likelihood because the number of paths through the garden of forking data is the product of the prior number of paths and the new number of paths.  The likelihood indicates the number of paths, and the prior indicates the prior number.  Multiplication is just compressed counting.  The average likelihood on the bottom just standardizes the counts so they sum to one.  Bayes' theorm expresses the counting that logic demands.
+
+<br>
+
+__Conditioning engines__
+
+There are three different conditioning engines (numerical techniques for computing posterior distributions):
+
+1. Grid approximation
+2. Quadratic approximation
+3. Markov chain Monte Carlo (MCMC)
+
+<br>
+
+__Grid approximation__
+
+You can achieve an excellent approximation of the continuous posterior distribution by considereing only a finite grid of parameter values.  At any particular value of a parameter, $p$, it's a simple matter to computer the posteriror probability: just multiply the prior probability of $p$ by the liklihood at $p$.  Repeating this procedure for each value in the grid generates an approximate picture of the exact posterior distribution.  This method is useful mainly as a pedagogical tool, as learning it forces the user to really understand the nature of Bayesian updating.  In most real-world modeling, however, grid approximation isn't practical because it scales poorly as your parameters increase.
+
+Steps
+
+1. __Define the grid__: This means you decide how many points to use in estimating the posterior, and then you make a list of the parameter values on the grid.
+2. __Compute the value of the prior at each parameter value on the grid__
+3. __Compute the likelihood at each parameter value__
+4. __Compute the unstandardized posterior at each parameter value, by multiplying the prior by the likelihood__
+5. __Standardize the posterior by dividing each value by the sum of all values__
+
+<br>
+
+__Quadratic approximation__
+
+Before long you'll have to resort to another approximation--one that makes stronger assumptions.  The reason is that the number of unique values to consider in the grid grows rapidly as the number of parameters in your model increases.  For the single-parameter glob tossing model, it's no problem to compute a grid of 100 or 1000 values.  But for two parameters approximated by 100 values each, that's already 100^2 = 10000 values to compute.  For 10 parameters, the grid becomes many billions of values.  These days it's routine to have models with hundreds or thousands of parameters.  The drid approximation strategy scales very poorly with model complexity, so it won't get us very far.
+
+__Quadratic approximation__: Under quote general conditions, the region near the peak of the posterior distribution will be nearly Gaussian--or "normal"--in distribution.  A Gaussian distribution is convenient, because because it can be completley described by only two numbers: the location of its center (_mean_) and its spread (_variance_).  A gaussian approximation is called "quadratic approximation" because the logarithm of a Gaussian distribution forms a parabola.  And a parabola is a quadratic function.  So this approximation essentially represents any log-posterior with a parabola.
+
+Steps
+
+1. __Find the posterior mode__: This is usually accomplished by some optimization algorithm, a procedure that virtually "climbs" the posterior distribution, as if it were a mountain.  The golem doesn't know where the peak is, but it does know the slope under its feet.  There are many well-developed optimization procedures, most of them more clver than simple hill climbing.  But all of them try to find peaks.
+2. __Estimate the curvature near the peak__: Once you find the peak of the posterior, you must estimate the curvature near the peak.  This curvature is sufficient to compute a quadratic approximation of the entire posterior distrubution.  In some cases, these calculations can be done analytically, but usually your computer uses some numerical technique instead.
+
+To compute the quadratic approximation for the globe tossing data, we'll use a tool in the `rethinking` package: `map`.  The abbreviation MAP stands for __Maximum A Posteriori__ which is just a fancy Latin name for the mode of the posterior distrubution.  
+
+> __Maximum likelihood estimation__: The quadratic approximation, either with a uniform prior or with a lot of data, is usually equivalent to a __Maximum Likelihood Estimate (MLE) and its __Standard Error__.  The MLE is a very common non-Bayesian parameter estimate.  This equivalence is both a blessing and a curse; a blessing, because it allows us to re-interpret a wide range of published non-Bayesian model fits in Bayesian terms; a curse, because MLEs have some curious drawback that get discussed later.
+
+<br>
+
+__Markov Chain Monte-Carlo (MCMC)__
+
+There are lots of important model types, like multi-level (mixed-effects) models, for which neither grid approximation nor quadratic approximation is always satisfactory.  Such models can easily have hundreds or thousands or tens-of-thousands of parameters.  Grid approximation obviously fails here, because it just takes too long.  Special forms of quadratic approximation might work if everything is _just_ right.  However, everything is _never_ just right.  Additionally, multilevel models do not always allow us to write down a single unified function for the posterior distribution.  This means that the function to maximize (when finding the MAP) is not known, but most be computer in pieces.
+
+As a result, various counter-intuitive model fitting techniques have arisen.  The most popular of these is __Markov Chain Monte-Carlo__ (MCMC), which is a family of conditioning engines capable of handling highly complex models.  It is fair to say that MCMC is largely responsible for the insurgence of Bayesian data analysis that began in the 1990s.  While MCMC is older than the 1990s, affordable computer power is not, so we must also thank the engineers.
+
+The conceptual challenge with MCMC lies in its highly non-obvious strategy.  Instead of attempting to compute or approximate the posterior distribution directly, MCMC techniques merely draw samples from the posterior.  You end up with a collection of parameter values, and the frequencies of these values correspond to the posterior plausibilities.  You can then build a picture of hte posterior from the histogram of these samples.
+
+We nearly always work directly with these samples, rather than first constructing some matematical estimate from them.  And the samples are in many ways more convenient than having the posterior, because they are easier to think with.  And so that's where we turn in the next chapter, to thinking with samples.
+
+
+Code examples {data-navmenu="Explore" data-icon="fa-code"}
+==================================================
+
+Row
+--------------------------------------------------
+### 2.1
+
+```{r code-2.1, echo=TRUE}
+ways <- c( 0 , 3 , 8 , 9 , 0 )
+ways/sum(ways)
+```
+
+Row
+--------------------------------------------------
+### 2.2
+
+```{r code-2.2, echo=TRUE}
+dbinom( 6 , size=9 , prob=0.5 )
+```
+
+Row
+--------------------------------------------------
+### 2.3
+
+```{r code-2.3, echo=TRUE}
+# define grid
+p_grid <- seq( from=0 , to=1 , length.out=20 )
+ 
+# define prior
+prior <- rep( 1 , 20 )
+
+# compute likelihood at each value in grid
+likelihood <- dbinom( 6 , size=9 , prob=p_grid )
+
+# compute product of likelihood and prior
+unstd.posterior <- likelihood * prior
+
+# standardize the posterior, so it sums to 1
+posterior <- unstd.posterior / sum(unstd.posterior)
+```
+
+Row {.tabset}
+--------------------------------------------------
+
+### 2.4 Plot
+
+```{r code-2.4-plot, fig.width=10}
+plot( p_grid , posterior , type="b" ,
+      xlab="probability of water" , ylab="posterior probability" )
+mtext( "20 points" )
+```
+
+### 2.4 Code
+
+```{r code-2.4-code, echo=TRUE, eval=FALSE}
+plot( p_grid , posterior , type="b" ,
+      xlab="probability of water" , ylab="posterior probability" )
+mtext( "20 points" )
+```
+
+Row
+--------------------------------------------------
+### 2.5
+
+```{r code-2.5, echo=TRUE}
+prior <- ifelse( p_grid < 0.5 , 0 , 1 )
+prior <- exp( -5*abs( p_grid - 0.5 ) )
+```
+
+Row
+--------------------------------------------------
+### 2.6
+
+```{r code-2.6, echo=TRUE}
+# library(rethinking)  # already loaded above
+globe.qa <- map(
+  alist(
+    w ~ dbinom(9,p) ,  # binomial likelihood
+    p ~ dunif(0,1)     # uniform prior
+  ) ,
+  data=list(w=6) )
+
+# display summary of quadratic approximation
+precis( globe.qa )
+```
+
+Row {.tabset}
+--------------------------------------------------
+
+### 2.7 Plot
+
+```{r code-2.7-plot, fig.width=10}
+# analytical calculation
+w <- 6
+n <- 9
+curve( dbeta( x , w+1 , n-w+1 ) , from=0 , to=1 )
+# quadratic approximation
+curve( dnorm( x , 0.67 , 0.16 ) , lty=2 , add=TRUE )
+```
+
+### 2.7 Code
+
+```{r code-2.7-code, echo=TRUE, eval=FALSE}
+# analytical calculation
+w <- 6
+n <- 9
+curve( dbeta( x , w+1 , n-w+1 ) , from=0 , to=1 )
+# quadratic approximation
+curve( dnorm( x , 0.67 , 0.16 ) , lty=2 , add=TRUE )
+```
+
+Tidy code examples {data-navmenu="Explore" data-icon="fa-magic"}
+==================================================
+
+Row
+--------------------------------------------------
+### 2.1
+
+```{r tidy-2.1, echo=TRUE}
+tibble(ways = c(0, 3, 8, 9, 0)) %>%
+  mutate(ways = ways / sum(ways)) %>%
+  datatable(options = dt_format)
+```
+
+Row
+--------------------------------------------------
+### 2.2
+
+```{r tidy-2.2, echo=TRUE}
+dbinom(6, size = 9, prob = 0.5)
+```
+
+Row
+--------------------------------------------------
+
+### 2.3
+
+```{r tidy-2.3, echo=TRUE}
+tidy_model <- tibble(
+  prob = seq(0, 1, length.out = 20),
+  prior = 1) %>%
+  mutate(likelihood = dbinom(6, size = 9, prob = prob),
+         unstd_posterior = likelihood * prior,
+         posterior = unstd_posterior / sum(unstd_posterior))
+
+tidy_model %>% datatable(options = dt_format)
+```
+
+Row {.tabset}
+--------------------------------------------------
+
+### 2.4 Plot
+
+```{r tidy-2.4-plot, fig.width=10}
+tidy_model %>%
+  ggplot(aes(x = prob)) +
+  geom_line(aes(y = posterior, color = "Posterior"), alpha = 0.6, size = 1) +
+  geom_line(aes(y = likelihood, color = "Likelihood"), alpha = 0.4, size = 1) +
+  geom_line(aes(y = prior, color = "Prior"), alpha = 0.3, linetype = 2, size = 1) +
+  scale_color_discrete(name = "Distribution", h = c(200, 300)) +
+  labs(caption = "n = 20",
+       x = "\nProbability of water",
+       y = "Posterior Probability\n")
+```
+
+### 2.4 Code
+
+```{r tidy-2.4-code, echo=TRUE, eval=FALSE}
+tidy_model %>%
+  ggplot(aes(x = prob)) +
+  geom_line(aes(y = posterior, color = "Posterior"), alpha = 0.6, size = 1) +
+  geom_line(aes(y = likelihood, color = "Likelihood"), alpha = 0.4, size = 1) +
+  geom_line(aes(y = prior, color = "Prior"), alpha = 0.3, linetype = 2, size = 1) +
+  scale_color_discrete(name = "Distribution", h = c(200, 300)) +
+  labs(caption = "n = 20",
+       x = "\nProbability of water",
+       y = "Posterior Probability\n")
+```
+
+Extend {data-navmenu="Explore" data-icon="fa-flask"}
+==================================================
+
+Grid Approx Function
+
+```{r echo=TRUE}
+grid_approx <- function(points, prior, verbose = FALSE) {
+  data <- tibble(
+    prob = seq(0, 1, length.out = points),
+    prior = prior
+  ) %>%
+    mutate(
+      likelihood = dbinom(6, size = 9, prob = prob),
+      unstd_posterior = likelihood * prior,
+      posterior = unstd_posterior / sum(unstd_posterior)
+    )
+  
+  if (verbose == TRUE) {
+    p <- data %>%
+      ggplot(aes(x = prob)) +
+      geom_line(aes(y = posterior, color = "Posterior"), alpha = 0.6, size = 1) +
+      geom_line(aes(y = likelihood, color = "Likelihood"), alpha = 0.4, size = 1) +
+      geom_line(aes(y = prior, color = "Prior"), alpha = 0.3, linetype = 2, size = 1) +
+      geom_point(aes(y = posterior, color = "Posterior"), size = 2) +
+      geom_point(aes(y = likelihood, color = "Likelihood"), size = 2)
+  } else {
+    p <- data %>%
+      ggplot(aes(x = prob)) +
+      geom_line(aes(y = posterior, color = "Posterior"), alpha = 0.6, size = 1) +
+      geom_point(aes(y = posterior, color = "Posterior"), size = 2)
+  }
+  p + 
+    scale_color_discrete(name = "Distribution", h = c(200, 300)) +
+    labs(
+      subtitle = glue::glue("Grid Approximation at {points} Points with prior set at {prior}"),
+      caption = glue::glue("n = {points}"),
+      x = "\nProbability",
+      y = "Posterior Probability\n") +
+    hrbrthemes::theme_ipsum_rc() 
+}
+```
+
+Row {.tabset}
+--------------------------------------------------
+
+### Plot
+
+```{r, fig.width=10}
+grid_approx(20, 1)
+```
+
+### Code
+
+```{r, echo=TRUE, eval=FALSE}
+grid_approx(20, 1) 
+```
+
+Row {.tabset}
+--------------------------------------------------
+
+### Plot
+
+```{r, fig.width=10}
+grid_approx(20, 1, verbose = TRUE)
+```
+
+### Code
+
+```{r, echo=TRUE, eval=FALSE}
+grid_approx(20, 1, verbose = TRUE)
+```
+

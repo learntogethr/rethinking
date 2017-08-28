@@ -1,0 +1,29 @@
+---
+title: "Chapter 00: Title"
+output: 
+  html_notebook:
+    toc: true
+    number_sections: true
+---
+
+# Packages
+
+```{r}
+
+```
+
+# Definitions
+
+# Code Examples 
+
+```{r code-0.0}
+
+```
+
+# Tidy the examples
+
+```{r tidy-0.0}
+
+```
+
+# Extend

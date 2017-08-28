@@ -1,0 +1,63 @@
+---
+title: "Chapter 00: Title"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    social: menu
+    source_code: embed
+    theme: lumen
+---
+
+<style>
+.desktop-layout {
+  padding: 30px;
+}
+</style>
+
+```{r}
+# options for DT::datatable
+dt_format <- list(
+  searching = FALSE,
+  paging = FALSE,
+  scrollX = TRUE,
+  scrollY = "300px")
+```
+
+Packages {data-navmenu="Explore" data-icon="fa-book"}
+==================================================
+
+## Packages
+
+You will load the following packages in order to work with the code provided in this chapter.
+
+```{r echo=TRUE}
+
+```
+
+```{r}
+library(DT)
+```
+
+
+Definitions {data-navmenu="Explore" data-icon="fa-puzzle-piece"}
+==================================================
+
+
+Code examples {data-navmenu="Explore" data-icon="fa-code"}
+==================================================
+
+
+Tidy code examples {data-navmenu="Explore" data-icon="fa-magic"}
+==================================================
+
+
+```{r eval=FALSE}
+# how to use the DT::datatable function
+datatable(tidy_model, options = dt_format)
+```
+
+Extend {data-navmenu="Explore" data-icon="fa-flask"}
+==================================================
+
+
